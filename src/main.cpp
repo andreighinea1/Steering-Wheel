@@ -1,15 +1,20 @@
 #include <Arduino.h>
+#include "mcp2515.h"
+
+/** NUMBER DISPLAY */
 /*
  Showing numbers, chars and phrases
-                            A (segments[0] in this project)
-                           ---
-F (segments[5] in this project) |   | B (segments[1] in this project)
-                          |   |
-                           --- G (segments[6] in this project)
-E (segments[4] in this project) |   |
-                          |   | C (segments[2] in this project)
-                           ---  . dot or dicimal (segments[7] in this project)
-                            D (segments[3] in this project)
+                 SEG_A
+               ---------
+              |         |
+        SEG_F |         | SEG_B
+              |         |
+               ---------  SEG_G
+              |         |
+        SEG_E |         | SEG_C
+              |         |
+               ---------   . dot (not used)
+                 SEG_D
 */
 #define SEG_A 2
 #define SEG_B 5
@@ -81,18 +86,15 @@ void testAllFast() {
 
 void Print(char Char) // print any character on the segment ( Note : you can't use capital characters )
 {
-    int charNum = -1;// set search resault to -1
-    setState(segMode);//turn off the segment
-    for (byte i = 0; i < CHAR_COUNT; i++) {//search for the entered character
-        if (Char == Chars[i][0]) {//if the character found
-            charNum = i;//set the resault number into charNum ( because this function prints the character using it's number in the array )
-        }
+    int charNum = -1; // set search result to -1
+    setState(segMode); //turn off the segment
+    for (byte i = 0; i < CHAR_COUNT; i++) { //search for the entered character
+        if (Char == Chars[i][0])
+            charNum = i;
     }
-    if (charNum == -1)// if the character not found
-    {
+    if (charNum == -1) { // if the character not found
         testAll();
-    } else // else if the character found print it
-    {
+    } else { // else if the character found print it
         for (byte i = 0; i < 7; i++) {
             digitalWrite(segments[i], Chars[charNum][i + 1]);
         }
@@ -101,13 +103,11 @@ void Print(char Char) // print any character on the segment ( Note : you can't u
 
 void Print(int num) // print any number on the segment
 {
-    setState(segMode);//turn off the segment
-    if (num > CHAR_COUNT || num < 0)// if the number is not declared
-    {
+    setState(segMode); //turn off the segment
+    if (num > CHAR_COUNT || num < 0) { // if the number is not declared
         testAll();
-    } else // else if the number declared, print it
-    {
-        if (segMode == 0) { //for segment mode
+    } else { // else if the number declared, print it
+        if (segMode == 0) { //for segment mode TODO: Make this with #ifdef to save code space
             for (int i = 0; i < 8; i++) {
                 digitalWrite(segments[i], Chars[num][i + 1]);
             }
@@ -119,6 +119,7 @@ void Print(int num) // print any number on the segment
     }
 }
 
+/** ARDUINO DEFAULT */
 void setup() {
     // set segment pins as OUTPUT
     pinMode(segments[0], OUTPUT);
@@ -136,7 +137,4 @@ void setup() {
 void loop() {
 //    Print('8');
     testAllFast();
-
-
-//    testAllFast();
 }
