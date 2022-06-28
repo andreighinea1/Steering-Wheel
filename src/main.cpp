@@ -1,7 +1,13 @@
 #include <Arduino.h>
 #include "mcp2515.h"
+#include "Wire.h"
+#include "LiquidCrystal_I2C.h"
 
-/** NUMBER DISPLAY */
+
+void Print(char Char);
+void Print(int num);
+
+/// NUMBER DISPLAY
 /*
  Showing numbers, chars and phrases
                  SEG_A
@@ -16,12 +22,12 @@
                ---------   . dot (not used)
                  SEG_D
 */
-#define SEG_A 2
-#define SEG_B 5
-#define SEG_C 8
-#define SEG_D 9
-#define SEG_E 4
-#define SEG_F 3
+#define SEG_A 9
+#define SEG_B 4
+#define SEG_C 3
+#define SEG_D 2
+#define SEG_E 5
+#define SEG_F 8
 #define SEG_G 7
 #define COMMON_CATHODE 0
 //#define COMMON_ANODE 1
@@ -55,6 +61,7 @@ void setState(bool mode) //sets the hole segment state to "mode"
 }
 
 void testAll() {
+    setState(segMode);
     for (int seg: segments) {
         delay(100);
         digitalWrite(seg, HIGH);
@@ -69,7 +76,16 @@ void testAll() {
     }
 }
 
+void testNumbers() {
+    setState(segMode);
+    for (byte i = 0; i <= 9; i++) {
+        Print(i);
+        delay(500);
+    }
+}
+
 void testAllFast() {
+    setState(segMode);
     for (int seg: segments) {
         delay(25);
         digitalWrite(seg, HIGH);
@@ -119,22 +135,135 @@ void Print(int num) // print any number on the segment
     }
 }
 
-/** ARDUINO DEFAULT */
-void setup() {
-    // set segment pins as OUTPUT
-    pinMode(segments[0], OUTPUT);
-    pinMode(segments[1], OUTPUT);
-    pinMode(segments[2], OUTPUT);
-    pinMode(segments[3], OUTPUT);
-    pinMode(segments[4], OUTPUT);
-    pinMode(segments[5], OUTPUT);
-    pinMode(segments[6], OUTPUT);
+/// TESTS FOR NUMBER DISPLAY
+//void setup() {
+//    // set segment pins as OUTPUT
+//    pinMode(segments[0], OUTPUT);
+//    pinMode(segments[1], OUTPUT);
+//    pinMode(segments[2], OUTPUT);
+//    pinMode(segments[3], OUTPUT);
+//    pinMode(segments[4], OUTPUT);
+//    pinMode(segments[5], OUTPUT);
+//    pinMode(segments[6], OUTPUT);
+//
+//    pinMode(6, OUTPUT);
+//    digitalWrite(6, LOW);
+//}
+//
+//void loop() {
+//    // Print('8');
+//    testAllFast();
+//    testNumbers();
+//}
 
-    pinMode(6, OUTPUT);
-    digitalWrite(6, LOW);
+
+/// TESTS FOR CAN
+//struct can_frame canMsg1;
+//struct can_frame canMsg2;
+//MCP2515 mcp2515(10);
+//
+//
+//void setup() {
+//    pinMode(6, OUTPUT);
+//    digitalWrite(6, LOW);
+//
+//    canMsg1.can_id  = 0x0F6;
+//    canMsg1.can_dlc = 8;
+//    canMsg1.data[0] = 0x8E;
+//    canMsg1.data[1] = 0x87;
+//    canMsg1.data[2] = 0x32;
+//    canMsg1.data[3] = 0xFA;
+//    canMsg1.data[4] = 0x26;
+//    canMsg1.data[5] = 0x8E;
+//    canMsg1.data[6] = 0xBE;
+//    canMsg1.data[7] = 0x86;
+//
+//    canMsg2.can_id  = 0x036;
+//    canMsg2.can_dlc = 8;
+//    canMsg2.data[0] = 0x0E;
+//    canMsg2.data[1] = 0x00;
+//    canMsg2.data[2] = 0x00;
+//    canMsg2.data[3] = 0x08;
+//    canMsg2.data[4] = 0x01;
+//    canMsg2.data[5] = 0x00;
+//    canMsg2.data[6] = 0x00;
+//    canMsg2.data[7] = 0xA0;
+//
+//    while (!Serial);
+//    Serial.begin(115200);
+//
+//    mcp2515.reset();
+//    mcp2515.setBitrate(CAN_125KBPS);
+//    mcp2515.setNormalMode();
+//
+//    Serial.println("Example: Write to CAN");
+//}
+//
+//void loop() {
+//    mcp2515.sendMessage(&canMsg1);
+//    mcp2515.sendMessage(&canMsg2);
+//
+//    Serial.println("Messages sent");
+//
+//    delay(100);
+//}
+
+
+/// TESTS FOR ANALOG PINS
+//void setup() {
+//    pinMode(6, OUTPUT);
+//    digitalWrite(6, LOW);
+//
+//    pinMode(A0, INPUT);
+//    pinMode(A1, INPUT);
+//
+//    while (!Serial);
+//    Serial.begin(115200);
+//}
+//
+//void loop() {
+//    Serial.print("A0: ");
+//    Serial.println(digitalRead(A0));
+//    Serial.print("A1: ");
+//    Serial.println(digitalRead(A1));  // TODO: This one is not working !!!!
+//    //Serial.println("");
+//    delay(250);
+//}
+
+
+/// LCD
+//LiquidCrystal_I2C lcd(0x27, 16, 2);
+//
+//void setup() {
+//    pinMode(6, OUTPUT);
+//    digitalWrite(6, LOW);
+//
+//    lcd.init();
+//    lcd.backlight();
+//    lcd.setCursor(0, 0);
+//    lcd.print("UPT Racing Team");
+//}
+//
+//void loop() {
+//
+//}
+
+
+/// ROW OF LEDs
+#define LED_PIN 6
+void setup() {
+    pinMode(LED_PIN, OUTPUT);
+    digitalWrite(LED_PIN, LOW);
 }
 
 void loop() {
-//    Print('8');
-    testAllFast();
+    //Fading the LED
+    for(int i=0; i<255; i++){
+        analogWrite(LED_PIN, i);
+        delay(5);
+    }
+    for(int i=255; i>0; i--){
+        analogWrite(LED_PIN, i);
+        delay(5);
+    }
 }
