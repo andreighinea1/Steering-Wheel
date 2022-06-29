@@ -1,9 +1,11 @@
+#define CEVA
+
 #include "steer_wheel.h"
 #include "unity.h"
 
-
 struct can_frame canMsg1;
 struct can_frame canMsg2;
+
 void setUp() {
     loadLCDDefault();
 
@@ -39,16 +41,13 @@ void setUp() {
     canMsg2.data[6] = 0x00;
     canMsg2.data[7] = 0xA0;
 
-    mcp2515.reset();
-    mcp2515.setBitrate(CAN_125KBPS);
-    mcp2515.setNormalMode();
+    mcp2515->reset();
+    mcp2515->setBitrate(CAN_125KBPS);
+    mcp2515->setNormalMode();
 
     /// SPEED BUTTONS
     pinMode(A0, INPUT);
     pinMode(A1, INPUT);
-
-    while (!Serial);
-    Serial.begin(115200);
 
     /// ROW OF LEDs
     pinMode(LED_PIN, OUTPUT);
@@ -60,36 +59,46 @@ void tearDown() {
 }
 
 void test_numbers_display() {  // ~25000 ms
-    Serial.println("1/4 - Starting test_numbers_display");
+    TEST_MESSAGE("1/4 - Starting test_numbers_display");
     for (int k = 0; k < 4; ++k) {  // 4 * 6225 ms
         testAllFast();
         testNumbers();
     }
+    setWholeNumberDisplayState(DISABLE_SEGMENT);
 }
 
 void test_can_messages() {  // 5000 ms
-    Serial.println("2/4 - Starting test_can_messages");
+    TEST_MESSAGE("2/4 - Starting test_can_messages");
     for (int k = 0; k < 50; ++k) {
-        mcp2515.sendMessage(&canMsg1);
-        mcp2515.sendMessage(&canMsg2);
+        mcp2515->sendMessage(&canMsg1);
+        mcp2515->sendMessage(&canMsg2);
         delay(100);
     }
 }
 
 void test_speed_buttons() {  // 25000 ms
-    Serial.println("3/4 - Starting test_speed_buttons");
+    int val_left, val_right;
+    char temp[50];
+
+    TEST_MESSAGE("3/4 - Starting test_speed_buttons");
     for (int k = 0; k < 100; ++k) {
-        Serial.print("A0: ");
-        Serial.println(digitalRead(A0));
-        Serial.print("A1: ");
-        Serial.println(digitalRead(A1));  // TODO: This one is not working !!!!
+        val_left = digitalRead(A1);
+        val_right = digitalRead(A0);
+        sprintf(temp, "    %d ---- %d    ", val_left, val_right);
+        lcd->setCursor(0, 0);
+        lcd->print(temp);
+
+        TEST_MESSAGE("A1 - left: ");
+        TEST_MESSAGE(val_left ? "1\n" : "0\n");  // TODO: This one is not working !!!!
+        TEST_MESSAGE("A0 - right: ");
+        TEST_MESSAGE(val_right ? "1\n" : "0\n");
         //Serial.println("");
         delay(250);
     }
 }
 
 void test_row_of_LEDs() {  // 15300 ms
-    Serial.println("4/4 - Starting test_row_of_LEDs");
+    TEST_MESSAGE("4/4 - Starting test_row_of_LEDs");
     for (int k = 0; k < 6; ++k) {
         // Fading the LED
         for (int i = 0; i < 255; i++) {
@@ -110,7 +119,7 @@ int runUnityTests() {
     RUN_TEST(test_speed_buttons);  // 25000 ms
     RUN_TEST(test_row_of_LEDs);  // 15300 ms
 
-    Serial.println("DONE");
+    TEST_MESSAGE("DONE\n");
     return UNITY_END();
 }
 
@@ -118,6 +127,10 @@ void setup() {  // TOTAL: ~72500 ms
     // Wait ~2 seconds before the Unity test runner
     // establishes connection with a board Serial interface
     delay(2000);
+
+    while (!Serial);
+    Serial.begin(115200);
+    Serial.println("test");
 
     runUnityTests();
 }
