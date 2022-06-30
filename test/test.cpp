@@ -1,5 +1,3 @@
-#define CEVA
-
 #include "steer_wheel.h"
 #include "unity.h"
 
@@ -46,8 +44,8 @@ void setUp() {
     mcp2515->setNormalMode();
 
     /// SPEED BUTTONS
-    pinMode(A0, INPUT);
-    pinMode(A1, INPUT);
+    pinMode(LEFT_BUTTON_A, INPUT);
+    pinMode(RIGHT_BUTTON_A, INPUT);
 
     /// ROW OF LEDs
     pinMode(LED_PIN, OUTPUT);
@@ -58,7 +56,7 @@ void tearDown() {
     // clean stuff up here
 }
 
-void test_numbers_display() {  // ~25000 ms
+void test_numbers_display() {  // ~12500 ms
     TEST_MESSAGE("1/4 - Starting test_numbers_display");
     for (int k = 0; k < 4; ++k) {  // 4 * 6225 ms
         testAllFast();
@@ -77,23 +75,25 @@ void test_can_messages() {  // 5000 ms
 }
 
 void test_speed_buttons() {  // 25000 ms
+//[[noreturn]] void test_speed_buttons() {  // 25000 ms
+    int prev_val_left = -1, prev_val_right = -1;
     int val_left, val_right;
-    char temp[50];
+    char temp[20];
 
     TEST_MESSAGE("3/4 - Starting test_speed_buttons");
-    for (int k = 0; k < 100; ++k) {
-        val_left = digitalRead(A1);
-        val_right = digitalRead(A0);
-        sprintf(temp, "    %d ---- %d    ", val_left, val_right);
-        lcd->setCursor(0, 0);
-        lcd->print(temp);
+    for (int k = 0; k < 500; ++k) {
+//    while (true) {
+        val_left = digitalRead(LEFT_BUTTON_A);  // TODO: This one is not working !!!!
+        val_right = digitalRead(RIGHT_BUTTON_A);
 
-        TEST_MESSAGE("A1 - left: ");
-        TEST_MESSAGE(val_left ? "1\n" : "0\n");  // TODO: This one is not working !!!!
-        TEST_MESSAGE("A0 - right: ");
-        TEST_MESSAGE(val_right ? "1\n" : "0\n");
-        //Serial.println("");
-        delay(250);
+        if (prev_val_left != val_left || prev_val_right != val_right) {
+            sprintf(temp, "    %d ---- %d    ", val_left, val_right);
+            lcd->setCursor(0, 0);
+            lcd->print(temp);
+
+            prev_val_left = val_left;
+            prev_val_right = val_right;
+        }
     }
 }
 
@@ -114,7 +114,7 @@ void test_row_of_LEDs() {  // 15300 ms
 
 int runUnityTests() {
     UNITY_BEGIN();
-    RUN_TEST(test_numbers_display); // ~25000 ms
+    RUN_TEST(test_numbers_display); // ~12500 ms
     RUN_TEST(test_can_messages);  // 5000 ms
     RUN_TEST(test_speed_buttons);  // 25000 ms
     RUN_TEST(test_row_of_LEDs);  // 15300 ms
@@ -123,14 +123,10 @@ int runUnityTests() {
     return UNITY_END();
 }
 
-void setup() {  // TOTAL: ~72500 ms
-    // Wait ~2 seconds before the Unity test runner
-    // establishes connection with a board Serial interface
-    delay(2000);
+void setup() {  // TOTAL: ~71000 ms
+    loadLCDDefault();
 
-    while (!Serial);
-    Serial.begin(115200);
-    Serial.println("test");
+    delay(500);
 
     runUnityTests();
 }

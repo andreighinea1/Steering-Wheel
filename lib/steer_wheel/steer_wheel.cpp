@@ -2,8 +2,8 @@
 
 
 /// NUMBER DISPLAY
-int segments[]{SEG_A, SEG_B, SEG_C, SEG_D, SEG_E, SEG_F, SEG_G}; // segment pins
-byte Chars[CHAR_COUNT][8]{
+const int segments[]{SEG_A, SEG_B, SEG_C, SEG_D, SEG_E, SEG_F, SEG_G}; // segment pins
+const byte Chars[CHAR_COUNT][8]{
         {'0', 1, 1, 1, 1, 1, 1, 0},//0
         {'1', 0, 1, 1, 0, 0, 0, 0},//1
         {'2', 1, 1, 0, 1, 1, 0, 1},//2
@@ -25,7 +25,6 @@ byte Chars[CHAR_COUNT][8]{
 MCP2515 *mcp2515 = new MCP2515(10);
 /// LCD
 LiquidCrystal_I2C *lcd = new LiquidCrystal_I2C(0x27, 16, 2);
-
 
 /// NUMBER DISPLAY
 void setSegmentNumberDisplayState(int seg, byte mode) // sets the hole segment state to "mode"
@@ -59,7 +58,7 @@ void Print(char Char) // print any character on the segment ( Note : you can't u
             num = i;
     }
     if (num == -1) { // if the character not found
-        testAllFast();
+//        testAllFast();
     } else { // else if the character found print it
         for (byte i = 0; i < 7; i++) {
             setSegmentNumberDisplayState(segments[i], Chars[num][i + 1]);
@@ -71,7 +70,7 @@ void Print(int num) // print any number on the segment
 {
     setWholeNumberDisplayState(DISABLE_SEGMENT); //turn off the segment
     if (num > CHAR_COUNT || num < 0) { // if the number is not declared
-        testAllFast();
+//        testAllFast();
     } else { // else if the number declared, print it
         for (byte i = 0; i < 7; i++) {
             setSegmentNumberDisplayState(segments[i], Chars[num][i + 1]);
@@ -109,6 +108,6 @@ void loadLCDDefault() {
     lcd->init();
     lcd->backlight();
     lcd->setCursor(0, 0);
-    lcd->print("UPT Racing Team");
+    lcd->print(F("UPT Racing Team"));
 }
 

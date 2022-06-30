@@ -21,12 +21,12 @@
                ---------   . dot (not used)
                  SEG_D
 */
-#define SEG_A 9
-#define SEG_B 4
-#define SEG_C 3
-#define SEG_D 2
-#define SEG_E 5
-#define SEG_F 8
+#define SEG_A 2
+#define SEG_B 5
+#define SEG_C 8
+#define SEG_D 9
+#define SEG_E 4
+#define SEG_F 3
 #define SEG_G 7
 #define CHAR_COUNT 16
 #define DISABLE_SEGMENT LOW
@@ -42,8 +42,8 @@ void testAllFast();
 void Print(char Char); // print any character on the segment ( Note : you can't use capital characters )
 void Print(int num); // print any number on the segment
 
-extern int segments[]; // segment pins
-extern byte Chars[CHAR_COUNT][8];
+extern const int segments[]; // segment pins
+extern const byte Chars[CHAR_COUNT][8];
 
 /// CAN
 extern MCP2515 *mcp2515;
@@ -54,5 +54,9 @@ void loadLCDDefault();
 
 /// ROW OF LEDS
 #define LED_PIN 6
+
+/// SPEED BUTTONS
+#define LEFT_BUTTON_A A0
+#define RIGHT_BUTTON_A A1
 
 #endif //STEERWHEEL_MAIN_H
