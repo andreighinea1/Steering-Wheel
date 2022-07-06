@@ -59,6 +59,11 @@ void loop() {
 
     if ((prev_val_left != val_left && val_left) || (prev_val_right != val_right && val_right)) {
         if (val_right) {  // TODO: Increase speed I think
+            if(currentSpeed == 6) {
+                prev_val_left = val_left;
+                prev_val_right = val_right;
+                return;
+            }
             ++currentSpeed;
         } else if (val_left) {  // TODO: Decrease speed I think
             if(!currentSpeed) {
