@@ -56,7 +56,7 @@ void loadLCDDefault();
 #define LED_PIN 6
 
 /// SPEED BUTTONS
-#define LEFT_BUTTON_A A0
-#define RIGHT_BUTTON_A A1
+#define LEFT_BUTTON_A A1
+#define RIGHT_BUTTON_A A0
 
 #endif //STEERWHEEL_MAIN_H

@@ -47,26 +47,34 @@ void setup() {
 
 
 void loop() {
-    val_left = digitalRead(LEFT_BUTTON_A);  // TODO: This one is not working !!!!
-    val_right = digitalRead(RIGHT_BUTTON_A);
+    // Also invert them to make them normal LOW (they are normal HIGH by implementation)
+    val_left = !digitalRead(LEFT_BUTTON_A);
+    val_right = !digitalRead(RIGHT_BUTTON_A);
 
-    if (prev_val_left != val_left || prev_val_right != val_right) {
+    if (prev_val_left != val_left || prev_val_right != val_right) {  // If something is different, update the display
+        sprintf(temp, "    %d ---- %d    ", val_right, val_left); // Reverse them because the LCD is reversed
+        lcd->setCursor(0, 0);
+        lcd->print(temp);
+    }
+
+    if ((prev_val_left != val_left && val_left) || (prev_val_right != val_right && val_right)) {
         if (val_right) {  // TODO: Increase speed I think
             ++currentSpeed;
-        } else if (val_left) {    // TODO: Decrease speed I think
+        } else if (val_left) {  // TODO: Decrease speed I think
+            if(!currentSpeed) {
+                prev_val_left = val_left;
+                prev_val_right = val_right;
+                return;
+            }
             --currentSpeed;
         }
         Print(currentSpeed);
-
-        sprintf(temp, "    %d ---- %d    ", val_left, val_right);
-        lcd->setCursor(0, 0);
-        lcd->print(temp);
-
-        prev_val_left = val_left;
-        prev_val_right = val_right;
 
         canMsg.data[0] = (val_left << 1) | val_right;
         mcp2515->sendMessage(&canMsg);
         delay(500);
     }
+
+    prev_val_left = val_left;
+    prev_val_right = val_right;
 }
